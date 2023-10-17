@@ -1,4 +1,5 @@
 import customtkinter
+from CTkMessagebox import CTkMessagebox
 
 #GUI settings
 customtkinter.set_appearance_mode("system") # Sets appearance mode based on system settings (Lights or Dark)
@@ -29,10 +30,22 @@ def setup_login_page():
 
     #Login button functions
     def login():
-        print("Logging in")
-
-    def signup():
-        print("Sign up")
+        username = username_entry.get()
+        password = password_entry.get()
+        
+        if username=="admin" and password=="123":
+            print(('Logged in!'))
+            
+            screen = customtkinter.CTkToplevel(app)
+            screen.title("App")
+            screen.geometry('920x600')
+            screen.config(bg="white")
+            username_entry2 = customtkinter.CTkEntry(master=screen, placeholder_text="Username")
+            username_entry2.pack(pady=12,padx=10)
+            screen.mainloop()
+            
+        else:
+            CTkMessagebox(title="Error",message="Username/password is invalid!",icon="cancel",width=375,height=150)
 
     #Login button
     login_button = customtkinter.CTkButton(master=frame,text="Login",command=login)
@@ -50,7 +63,7 @@ def setup_login_page():
 
     def on_click_signup(event):
         print("test")
-        signup()
+        signup_page()
         frame.pack_forget()  
     #Signup button
     signup_label = customtkinter.CTkLabel(master=frame, text="Don't have an account? Sign up here", fg_color="transparent")
@@ -63,8 +76,7 @@ def setup_login_page():
 def signup_page():
     frame2 = customtkinter.CTkFrame(master=app)
     frame2.pack(padx=0,pady=(10,5),fill="both",expand=True)
-    progress_bar = customtkinter.CTkProgressBar(master=frame2,orientation="horizontal")
-    progress_bar.pack(pady=10,padx=10)
+    free_label = customtkinter.CTkLabel(master=frame2,text="Don't have an account?",fg_color="blue")
 setup_login_page()
 print("First commit")
 app.mainloop()
