@@ -8,6 +8,7 @@ import customtkinter
 import time
 from functools import partial
 from CTkMessagebox import CTkMessagebox
+import re
 
 def exit_application():
         import sys
@@ -72,7 +73,57 @@ class SignUpPage(customtkinter.CTk):
         confirm_password_entry.bind("<Leave>", lambda event,button=confirm_password_entry: on_leave(event,button))
         signup_frame.grid_rowconfigure(4, weight=1)
         signup_frame.grid_columnconfigure(0, weight=1)
-        signup_button = customtkinter.CTkButton(master=self,text="SIGN UP",corner_radius=10,border_width = 3,border_color = "green",font=("Tahoma Bold",20))
+        def validateSignUp ():
+            name = name_entry.get()
+            email = email_entry.get()
+            password = password_entry.get()
+            confirm_password = confirm_password_entry.get()
+            if not name or not email or not password or not confirm_password:
+                CTkMessagebox(title="Error",message="Please fill in everything!",icon="cancel",width=375,height=150)
+                return
+            #FUNCTIONS
+            def has_number(string):
+                    return re.search('\d',string)
+            def has_space(string):
+                  return ' ' in string
+            def is_valid_email(email):
+                email_pattern  = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                return re.match(email_pattern,email)
+            def has_uppercase(password):
+                return any(char.isupper() for char in password)    
+            def valid_password(password):
+                if len(password) < 6:
+                    return "Password is too short!"
+                    
+                def has_number(password):
+                        return any(char.isdigit() for char in password) 
+                if not has_uppercase(password):
+                    return "Password must contain an uppercase!"
+                 
+                if not has_number(password):
+                      return "Password must contain at least 1 digit!"
+                        
+                
+                    
+            if has_number(name):
+                    CTkMessagebox(title="Error",message="Numbers not allowed when giving name",icon="cancel",width=375,height=150)
+                    return
+            if not has_space(name):
+                    CTkMessagebox(title="Error",message="Full name required, only 1 was given",icon="cancel",width=375,height=150)
+                    return
+            if not is_valid_email(email):
+                    CTkMessagebox(title="Error",message="Invalid email, try again!",icon="cancel",width=375,height=150)
+                    return 
+            
+            msg = valid_password(password)
+            if msg:
+                    CTkMessagebox(title="Error",message=msg,icon="cancel",width=375,height=150)
+                    return
+            if not password == confirm_password:
+                    CTkMessagebox(title="Error",message="Password is not the same as the one entered in confirm password!",icon="cancel",width=375,height=150)
+                    return
+            print("Passed all checks!")
+        signup_button = customtkinter.CTkButton(master=self,text="SIGN UP",corner_radius=10,border_width = 3,border_color = "green",font=("Tahoma Bold",20),command=validateSignUp)
         signup_button.pack(padx=10, pady=10)
 
         
