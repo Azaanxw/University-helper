@@ -75,6 +75,9 @@ class SignUpPage(customtkinter.CTk):
         signup_frame.grid_columnconfigure(0, weight=1)
         def validateSignUp ():
             name = name_entry.get()
+            def back_to_main_page(self):
+                self.withdraw()
+                self.main_page.mainloop()
             email = email_entry.get()
             password = password_entry.get()
             confirm_password = confirm_password_entry.get()
@@ -102,8 +105,9 @@ class SignUpPage(customtkinter.CTk):
                  
                 if not has_number(password):
                       return "Password must contain at least 1 digit!"
-                        
-                
+            
+                setup_main_page(self)
+             
                     
             if has_number(name):
                     CTkMessagebox(title="Error",message="Numbers not allowed when giving name",icon="cancel",width=375,height=150)
@@ -125,7 +129,9 @@ class SignUpPage(customtkinter.CTk):
             print("Passed all checks!")
         signup_button = customtkinter.CTkButton(master=self,text="SIGN UP",corner_radius=10,border_width = 3,border_color = "green",font=("Tahoma Bold",20),command=validateSignUp)
         signup_button.pack(padx=10, pady=10)
-
+        def setup_main_page(self):
+             self.withdraw()
+             self.main_page.mainloop()
         
         def on_enter_login_button(event):
             back_to_login_button.configure(text_color="#30C30F",font=("Helvetica",15,"bold"))
@@ -138,8 +144,9 @@ class SignUpPage(customtkinter.CTk):
         back_to_login_button.bind("<Leave>",on_leave_login_button)
     def assign_login_page(self,page):
              self.login_page = page
-
-
+    def assign_main_page(self,page):
+             self.main_page = page
+    
     def turn_on(self):
          self.deiconify()
          self.mainloop()

@@ -7,7 +7,7 @@ icon_path = "Images\\diploma icon.ico"
 customtkinter.set_appearance_mode("system") # Sets appearance mode based on system settings (Lights or Dark)
 customtkinter.set_default_color_theme("green")
 class LoginPage(customtkinter.CTk):
-    def __init__(self,signup_page, fg_color: str | Tuple[str, str] | None = None, **kwargs):  # default settings for the page
+    def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):  # default settings for the page
         super().__init__(fg_color, **kwargs)
         self.title("Login")
         self.geometry("450x350")
@@ -37,8 +37,7 @@ class LoginPage(customtkinter.CTk):
                 print(('Logged in!'))
                 self.withdraw()  #closes the previous login page
                 #Setup the main application window
-                main  = MainPage()
-                main.mainloop()
+                setup_main_page(self)
             else:
                 if not username:
                     CTkMessagebox(title="Error",message="Please provide a username",icon="cancel",width=375,height=150)
@@ -71,8 +70,15 @@ class LoginPage(customtkinter.CTk):
         signup_label.bind("<Button-1>",on_click_signup)
         def setup_signup_page(self):
              self.withdraw()
-             signup_page.deiconify()
-             signup_page.mainloop()
+             self.signup_page.deiconify()
+             self.signup_page.mainloop()
+        def setup_main_page(self):
+             self.withdraw()
+             self.main_page.mainloop()
+    def assign_main_page(self,page):
+             self.main_page = page
+    def assign_signup_page(self,page):
+             self.signup_page = page
     def turn_off(self):
             self.withdraw()
     def turn_on(self):
