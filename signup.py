@@ -60,7 +60,7 @@ class SignUpPage(customtkinter.CTk):
         confirm_password_entry = customtkinter.CTkEntry(master=signup_frame,width=200)
         confirm_password_entry.grid(row=3, column=1, padx=10, pady=15)
         #BINDING EVENTS 
-        def on_enter(event,button):
+        def on_enter(event,button): 
              button.configure(border_color="#42b0f5")
         def on_leave(event,button):
               button.configure(border_color="#565B5E")

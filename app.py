@@ -12,3 +12,4 @@ class MainPage(customtkinter.CTk):
         self.resizable(False,False) 
         username_entry2 = customtkinter.CTkEntry(master=self, placeholder_text="ENTER SMTH HERE")
         username_entry2.pack(pady=12,padx=10)
+ 

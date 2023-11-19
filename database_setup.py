@@ -9,7 +9,7 @@ def setup_database():
                     username TEXT UNIQUE NOT NULL,
                     email TEXT,
                     password TEXT NOT NULL
-                    )    
+                    )     
                     ''')
     cursor.execute('INSERT OR IGNORE INTO users (username,email,password) VALUES (?,?,?)', ('admin','admin@test.com','123'))
     conn.commit()

@@ -48,7 +48,7 @@ class LoginPage(customtkinter.CTk):
             dataset = cursor.fetchall() 
             for data in dataset:
                 if data['username'] == username and data['password'] == password:
-                    conn.close()
+                    conn.close() 
                     self.withdraw()  #closes the previous login page
                     CTkMessagebox(title="Login successful!",message=f"Welcome {username},you are now logged in!",icon="check",fade_in_duration=1)
                     #Setup the main application window
