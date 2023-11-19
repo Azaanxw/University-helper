@@ -1,47 +1,49 @@
-import email
+## IMPORTS ##
 from PIL import Image
 from os import name
 from tkinter import ANCHOR, LEFT
-from turtle import width
-from typing import Optional, Tuple, Union
+from typing import  Tuple
 import customtkinter
-import time
 import sqlite3
 from functools import partial
 from CTkMessagebox import CTkMessagebox
 import re
 
-def exit_application():
+icon_path = "Images\\diploma icon.ico"  # Icon path for Signup tab
+def exit_application(): # Exits the signup page w out any errors from callbacks etc
         import sys
-        sys.exit(0)  # Exit the application gracefully
-icon_path = "Images\\diploma icon.ico" 
-class SignUpPage(customtkinter.CTk):
+        sys.exit(0)
+
+#Signup class
+class SignUpPage(customtkinter.CTk): 
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):
         super().__init__(fg_color, **kwargs)
-        self.title("Sign up")
-        self.geometry('620x400')
-        self.iconbitmap(default=icon_path)
-        self.resizable(False,False)
+        self.title("Sign up") #Name of the signup window
+        self.geometry('620x400') # Size of the signup window
+        self.iconbitmap(default=icon_path) # Icon that will be displayed for the login window
+        self.resizable(False,False) # Makes the window non-resizable 
         def on_closing():
                 self.destroy()  # Close the main window
                 exit_application()  # Call a function to exit the application gracefully
-        self.protocol("WM_DELETE_WINDOW", on_closing)
-        def back_to_login(self):
-            self.withdraw()
-            self.login_page.deiconify()
-            self.login_page.mainloop()
+        self.protocol("WM_DELETE_WINDOW", on_closing) # Assigns on_closing function when the window is destroyed
+        def back_to_login(self): # Function that sends user back to login page when the button is clicked
+            self.withdraw() # Makes the signup window disappear
+            self.login_page.deiconify() # Makes the login page reappear
+            self.login_page.mainloop() # Puts the login page on the mainloop
+        #Signup page title
         signup_label = customtkinter.CTkLabel(master=self,text="Create your account",font =("Arial",35))
         signup_label.pack(pady=12,padx=10)
+
+        #Signup frame setup (using a different frame so that i can use the grid method as the current self is already set up by pack)
         signup_frame = customtkinter.CTkFrame(master=self,fg_color="transparent")
         signup_frame.pack(padx=10,pady=10)
 
+        #Labels and inputs for the sign up page
         user_icon = customtkinter.CTkImage(dark_image=Image.open("Images\\user.png"),size=(30, 30))
         user_label = customtkinter.CTkLabel(master=signup_frame,text="  Username:",image=user_icon,compound="left",font=("Bahnschrift",20))
         user_label.grid(row=0, column=0, padx=10,pady=15)
         user_entry = customtkinter.CTkEntry(master=signup_frame,width=200)
         user_entry.grid(row=0, column=1, padx=10, pady=15)
-
-       
         
         email_icon = customtkinter.CTkImage(dark_image=Image.open("Images\\email.png"),size=(30, 30))
         email_label = customtkinter.CTkLabel(master=signup_frame,text="   Email:",image=email_icon, compound="left",font=("Bahnschrift",20))
@@ -59,68 +61,76 @@ class SignUpPage(customtkinter.CTk):
         confirm_password_label.grid(row=3, column=0, padx=10, pady=10)
         confirm_password_entry = customtkinter.CTkEntry(master=signup_frame,width=200)
         confirm_password_entry.grid(row=3, column=1, padx=10, pady=15)
-        #BINDING EVENTS 
-        def on_enter(event,button): 
-             button.configure(border_color="#42b0f5")
-        def on_leave(event,button):
-              button.configure(border_color="#565B5E")
-        user_entry.bind("<Enter>", lambda event,button=user_entry: on_enter(event,button))
-        user_entry.bind("<Leave>", lambda event,button=user_entry: on_leave(event,button))
-        email_entry.bind("<Enter>", lambda event,button=email_entry: on_enter(event,button))
-        email_entry.bind("<Leave>", lambda event,button=email_entry: on_leave(event,button))
-        password_entry.bind("<Enter>", lambda event,button=password_entry: on_enter(event,button))
-        password_entry.bind("<Leave>", lambda event,button=password_entry: on_leave(event,button))
-        confirm_password_entry.bind("<Enter>", lambda event,button=confirm_password_entry: on_enter(event,button))
-        confirm_password_entry.bind("<Leave>", lambda event,button=confirm_password_entry: on_leave(event,button))
+
+        #Makes the input bar glow when hovered on
+        def on_enter(event,entry_box): 
+             entry_box.configure(border_color="#42b0f5") # Changes input border to blue
+        def on_leave(event,entry_box):
+              entry_box.configure(border_color="#565B5E") # Changes input border color back to dark gray
+        
+        #Binds all the entry boxes to the given functions
+        user_entry.bind("<Enter>", lambda event,entry_box=user_entry: on_enter(event,entry_box))
+        user_entry.bind("<Leave>", lambda event,entry_box=user_entry: on_leave(event,entry_box))
+        email_entry.bind("<Enter>", lambda event,entry_box=email_entry: on_enter(event,entry_box))
+        email_entry.bind("<Leave>", lambda event,entry_box=email_entry: on_leave(event,entry_box))
+        password_entry.bind("<Enter>", lambda event,entry_box=password_entry: on_enter(event,entry_box))
+        password_entry.bind("<Leave>", lambda event,entry_box=password_entry: on_leave(event,entry_box))
+        confirm_password_entry.bind("<Enter>", lambda event,entry_box=confirm_password_entry: on_enter(event,entry_box))
+        confirm_password_entry.bind("<Leave>", lambda event,entry_box=confirm_password_entry: on_leave(event,entry_box))
+        
+        #Signup frame grid setup
         signup_frame.grid_rowconfigure(4, weight=1)
         signup_frame.grid_columnconfigure(0, weight=1)
-        def validateSignUp ():
+        def validateSignUp (): # Checks if user can signup or not
+            #Gets the current string values from input box
             user = user_entry.get()
             email = email_entry.get()
             password = password_entry.get()
             confirm_password = confirm_password_entry.get()
-            if not user or not email or not password or not confirm_password:
+
+            if not user or not email or not password or not confirm_password: # Checks if the string is empty or not
                 CTkMessagebox(title="Error",message="Please fill in everything!",icon="cancel",width=375,height=150)
                 return
             #FUNCTIONS
-            def is_valid_email(email):
+            def is_valid_email(email): # returns whether email matches the pattern
                 email_pattern  = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
                 return re.match(email_pattern,email)
-            def has_uppercase(password):
+            
+            def has_uppercase(password): # Checks if at least 1 char has an uppercase
                 return any(char.isupper() for char in password) 
 
-            def valid_user(user):
+            def valid_user(user): # Checks database to see if user trying to signup already exists
                 #CHECKS THE DATABASE
-                conn = sqlite3.connect('database.db')
-                conn.row_factory = sqlite3.Row
-                cursor = conn.cursor()
-                cursor.execute('SELECT * FROM users')
-                dataset = cursor.fetchall()
-                for data in dataset:
-                    if data['username'] == user:
-                        conn.close()
+                conn = sqlite3.connect('database.db') # connects to the database file and creates one if there isn't one already
+                conn.row_factory = sqlite3.Row # returns rows as special row objects and allows to use dictionary e.g. data[username] instead of data[0]
+                cursor = conn.cursor()  # creates cursor object that interacts with the SQLite database
+                cursor.execute('SELECT * FROM users') # grabs all the data from the table 'users'
+                dataset = cursor.fetchall() # fetches the results given
+                for data in dataset: # loops through all the data
+                    if data['username'] == user: # Checks if any of the usernames already exist
+                        conn.close() # Closes the connection to the database to save on resources
                         return 'Username already exists! Try a different one.'
-                conn.close()
-                if len(user) < 3:
+                conn.close() # Closes the connection to the database to save on resources
+                if len(user) < 3: # Checks if the length of the user is less than 3
                      return 'Username is too short!'
-                special_chars = "!@#$%^&*()_+-={}[]|\\:;\"'<>,.?/"
-                for char in user:
-                     if char in set(special_chars):
+                special_chars = "!@#$%^&*()_+-={}[]|\\:;\"'<>,.?/" 
+                for char in user: # Loops through every character in user
+                     if char in set(special_chars): # Checks if any of the characters in user have a special character 
                                return 'Special characters are not allowed when creating usernames!'
                 return          
-            def valid_password(password):
-                if len(password) < 6:
+            def valid_password(password): # Checks if password meets all given conditions
+                if len(password) < 6:  # Checks if password length is shorter than 6 
                     return "Password is too short!"
                     
-                def has_number(password):
+                def has_number(password): # Checks if password has at least 1 number 
                         return any(char.isdigit() for char in password) 
-                if not has_uppercase(password):
+                if not has_uppercase(password): # Checks if password has at least 1 uppercase
                     return "Password must contain an uppercase!"
                  
-                if not has_number(password):
+                if not has_number(password): # Returns message if password doesn't have atleast 1 number
                       return "Password must contain at least 1 digit!"
                 return
-            def does_user_exist():
+            def does_user_exist(): # Checks if user already exists in database
                 #CHECKS THE DATABASE
                 conn = sqlite3.connect('database.db')
                 conn.row_factory = sqlite3.Row
@@ -134,6 +144,7 @@ class SignUpPage(customtkinter.CTk):
                 conn.close()
                 return False
             
+            # Message input boxes for errors
             if not is_valid_email(email):
                     CTkMessagebox(title="Error",message="Invalid email, try again!",icon="cancel",width=375,height=150)
                     return 
@@ -145,6 +156,7 @@ class SignUpPage(customtkinter.CTk):
             if not password == confirm_password:
                     CTkMessagebox(title="Error",message="Password is not the same as the one entered in confirm password!",icon="cancel",width=375,height=150)
                     return
+            
             user_msg = valid_user(user)
             if user_msg:
                     CTkMessagebox(title="Error",message=user_msg,icon="cancel",width=375,height=150)
@@ -153,17 +165,21 @@ class SignUpPage(customtkinter.CTk):
                   CTkMessagebox(title="Error",message="Account already exists! Please login",icon="cancel",width=375,height=150)
                   return
             
-            else:
+            else: # Executes if user meets all requirements for creating account
                 print("Passed all checks!")
                 conn = sqlite3.connect('database.db')
                 cursor = conn.cursor()
-                cursor.execute('INSERT OR IGNORE INTO users (username,email,password) VALUES (?,?,?)', (user,email,password))
+                cursor.execute('INSERT OR IGNORE INTO users (username,email,password) VALUES (?,?,?)', (user,email,password)) # Adds the new user,email and pass to the database
                 conn.commit()
                 conn.close()
                 CTkMessagebox(title="Account created!",message="Your account has been successfully created! You will now be redirected to main page",icon="check",fade_in_duration=1)
-                setup_main_page(self)
+                setup_main_page(self) # Sets up the main page
+               
+        #Signup button 
         signup_button = customtkinter.CTkButton(master=self,text="SIGN UP",corner_radius=10,border_width = 3,border_color = "green",font=("Tahoma Bold",20),command=validateSignUp)
         signup_button.pack(padx=10, pady=10)
+
+        #Signup Functions
         def setup_main_page(self):
              self.withdraw()
              self.main_page.mainloop()
@@ -173,17 +189,24 @@ class SignUpPage(customtkinter.CTk):
         
         def on_leave_login_button(event):
             back_to_login_button.configure(text_color="#DCE4EE",cursor="hand2",font=("Helvetica",15,"normal"))
+        
+        #Back to login button
         back_to_login_button = customtkinter.CTkButton(master=self,text="Back to login",bg_color="transparent",fg_color="transparent",font=("Helvetica",15,"normal"),hover=False,command=partial(back_to_login,self))
         back_to_login_button.pack(side=customtkinter.BOTTOM)
+
+        #Binds functions to events for the back to login button
         back_to_login_button.bind("<Enter>",on_enter_login_button) 
         back_to_login_button.bind("<Leave>",on_leave_login_button)
+    #PUBLIC Signup functions
     def assign_login_page(self,page):
              self.login_page = page
+
     def assign_main_page(self,page):
              self.main_page = page
-    
+
     def turn_on(self):
          self.deiconify()
          self.mainloop()
+         
     def turn_off(self):
          self.withdraw()
