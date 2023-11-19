@@ -45,7 +45,7 @@ class LoginPage(customtkinter.CTk):
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM users')
-            dataset = cursor.fetchall()
+            dataset = cursor.fetchall() 
             for data in dataset:
                 if data['username'] == username and data['password'] == password:
                     conn.close()

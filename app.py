@@ -9,6 +9,6 @@ class MainPage(customtkinter.CTk):
         self.title("University Helper")
         self.geometry("920x600")
         self.iconbitmap(default=icon_path)
-        self.resizable(False,False)
+        self.resizable(False,False) 
         username_entry2 = customtkinter.CTkEntry(master=self, placeholder_text="ENTER SMTH HERE")
         username_entry2.pack(pady=12,padx=10)

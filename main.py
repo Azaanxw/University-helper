@@ -13,4 +13,4 @@ signup_page.assign_main_page(page= main_page)
 login_page.assign_main_page(page= main_page)
 login_page.assign_signup_page(page=signup_page)
 login_page.turn_on() 
-
+ 
