@@ -3,7 +3,7 @@ import customtkinter
 import time
 from CTkMessagebox import CTkMessagebox
 icon_path = "Images\\diploma icon.ico"    
-class MainPage(customtkinter.CTk):
+class MainPage(customtkinter.CTk): 
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):  # default settings for the page
         super().__init__(fg_color, **kwargs)
         self.title("University Helper")

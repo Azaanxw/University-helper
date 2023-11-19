@@ -6,6 +6,7 @@ from turtle import width
 from typing import Optional, Tuple, Union
 import customtkinter
 import time
+import sqlite3
 from functools import partial
 from CTkMessagebox import CTkMessagebox
 import re
@@ -34,11 +35,11 @@ class SignUpPage(customtkinter.CTk):
         signup_frame = customtkinter.CTkFrame(master=self,fg_color="transparent")
         signup_frame.pack(padx=10,pady=10)
 
-        name_icon = customtkinter.CTkImage(dark_image=Image.open("Images\\user.png"),size=(30, 30))
-        name_label = customtkinter.CTkLabel(master=signup_frame,text="   Full name:",image=name_icon,compound="left",font=("Bahnschrift",20))
-        name_label.grid(row=0, column=0, padx=10,pady=15)
-        name_entry = customtkinter.CTkEntry(master=signup_frame,width=200)
-        name_entry.grid(row=0, column=1, padx=10, pady=15)
+        user_icon = customtkinter.CTkImage(dark_image=Image.open("Images\\user.png"),size=(30, 30))
+        user_label = customtkinter.CTkLabel(master=signup_frame,text="  Username:",image=user_icon,compound="left",font=("Bahnschrift",20))
+        user_label.grid(row=0, column=0, padx=10,pady=15)
+        user_entry = customtkinter.CTkEntry(master=signup_frame,width=200)
+        user_entry.grid(row=0, column=1, padx=10, pady=15)
 
        
         
@@ -63,8 +64,8 @@ class SignUpPage(customtkinter.CTk):
              button.configure(border_color="#42b0f5")
         def on_leave(event,button):
               button.configure(border_color="#565B5E")
-        name_entry.bind("<Enter>", lambda event,button=name_entry: on_enter(event,button))
-        name_entry.bind("<Leave>", lambda event,button=name_entry: on_leave(event,button))
+        user_entry.bind("<Enter>", lambda event,button=user_entry: on_enter(event,button))
+        user_entry.bind("<Leave>", lambda event,button=user_entry: on_leave(event,button))
         email_entry.bind("<Enter>", lambda event,button=email_entry: on_enter(event,button))
         email_entry.bind("<Leave>", lambda event,button=email_entry: on_leave(event,button))
         password_entry.bind("<Enter>", lambda event,button=password_entry: on_enter(event,button))
@@ -74,26 +75,39 @@ class SignUpPage(customtkinter.CTk):
         signup_frame.grid_rowconfigure(4, weight=1)
         signup_frame.grid_columnconfigure(0, weight=1)
         def validateSignUp ():
-            name = name_entry.get()
-            def back_to_main_page(self):
-                self.withdraw()
-                self.main_page.mainloop()
+            user = user_entry.get()
             email = email_entry.get()
             password = password_entry.get()
             confirm_password = confirm_password_entry.get()
-            if not name or not email or not password or not confirm_password:
+            if not user or not email or not password or not confirm_password:
                 CTkMessagebox(title="Error",message="Please fill in everything!",icon="cancel",width=375,height=150)
                 return
             #FUNCTIONS
-            def has_number(string):
-                    return re.search('\d',string)
-            def has_space(string):
-                  return ' ' in string
             def is_valid_email(email):
                 email_pattern  = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
                 return re.match(email_pattern,email)
             def has_uppercase(password):
-                return any(char.isupper() for char in password)    
+                return any(char.isupper() for char in password) 
+
+            def valid_user(user):
+                #CHECKS THE DATABASE
+                conn = sqlite3.connect('database.db')
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                cursor.execute('SELECT * FROM users')
+                dataset = cursor.fetchall()
+                for data in dataset:
+                    if data['username'] == user:
+                        conn.close()
+                        return 'Username already exists! Try a different one.'
+                conn.close()
+                if len(user) < 3:
+                     return 'Username is too short!'
+                special_chars = "!@#$%^&*()_+-={}[]|\\:;\"'<>,.?/"
+                for char in user:
+                     if char in set(special_chars):
+                               return 'Special characters are not allowed when creating usernames!'
+                return          
             def valid_password(password):
                 if len(password) < 6:
                     return "Password is too short!"
@@ -105,28 +119,49 @@ class SignUpPage(customtkinter.CTk):
                  
                 if not has_number(password):
                       return "Password must contain at least 1 digit!"
+                return
+            def does_user_exist():
+                #CHECKS THE DATABASE
+                conn = sqlite3.connect('database.db')
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+                cursor.execute('SELECT * FROM users')
+                dataset = cursor.fetchall()
+                for data in dataset:
+                    if data['username'] == user and data['password'] == password:
+                        conn.close()
+                        return True
+                conn.close()
+                return False
             
-                setup_main_page(self)
-             
-                    
-            if has_number(name):
-                    CTkMessagebox(title="Error",message="Numbers not allowed when giving name",icon="cancel",width=375,height=150)
-                    return
-            if not has_space(name):
-                    CTkMessagebox(title="Error",message="Full name required, only 1 was given",icon="cancel",width=375,height=150)
-                    return
             if not is_valid_email(email):
                     CTkMessagebox(title="Error",message="Invalid email, try again!",icon="cancel",width=375,height=150)
                     return 
             
-            msg = valid_password(password)
-            if msg:
-                    CTkMessagebox(title="Error",message=msg,icon="cancel",width=375,height=150)
+            pass_msg= valid_password(password)
+            if pass_msg:
+                    CTkMessagebox(title="Error",message=pass_msg,icon="cancel",width=375,height=150)
                     return
             if not password == confirm_password:
                     CTkMessagebox(title="Error",message="Password is not the same as the one entered in confirm password!",icon="cancel",width=375,height=150)
                     return
-            print("Passed all checks!")
+            user_msg = valid_user(user)
+            if user_msg:
+                    CTkMessagebox(title="Error",message=user_msg,icon="cancel",width=375,height=150)
+                    return
+            if does_user_exist():
+                  CTkMessagebox(title="Error",message="Account already exists! Please login",icon="cancel",width=375,height=150)
+                  return
+            
+            else:
+                print("Passed all checks!")
+                conn = sqlite3.connect('database.db')
+                cursor = conn.cursor()
+                cursor.execute('INSERT OR IGNORE INTO users (username,email,password) VALUES (?,?,?)', (user,email,password))
+                conn.commit()
+                conn.close()
+                CTkMessagebox(title="Account created!",message="Your account has been successfully created! You will now be redirected to main page",icon="check",fade_in_duration=1)
+                setup_main_page(self)
         signup_button = customtkinter.CTkButton(master=self,text="SIGN UP",corner_radius=10,border_width = 3,border_color = "green",font=("Tahoma Bold",20),command=validateSignUp)
         signup_button.pack(padx=10, pady=10)
         def setup_main_page(self):

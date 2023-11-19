@@ -1,8 +1,10 @@
 from ast import main
+from database_setup import setup_database
 from login import LoginPage
 from signup import SignUpPage
 from app import MainPage
 import customtkinter
+setup_database()
 signup_page = SignUpPage()
 main_page = MainPage()
 login_page = LoginPage()

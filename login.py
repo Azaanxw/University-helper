@@ -1,6 +1,8 @@
+from tarfile import data_filter
 from typing import Optional, Tuple, Union
 import customtkinter
 import time
+import sqlite3
 from CTkMessagebox import CTkMessagebox
 from app import MainPage
 icon_path = "Images\\diploma icon.ico"        
@@ -27,25 +29,37 @@ class LoginPage(customtkinter.CTk):
 
         def login():
             username = username_entry.get()
+            password = password_entry.get() 
             if username:
                 username_words = username.split() #splits the username string into a list of words depending on if theres space or not
                 username = "".join(username_words) #joins the words together with no spaces
+            if not username:
+                CTkMessagebox(title="Error",message="Please provide a username",icon="cancel",width=375,height=150)
+                return
+            elif not password:
+                CTkMessagebox(title="Error",message="Please provide a password",icon="cancel",width=375,height=150)
+                return
+
+            #CHECKS THE DATABASE
+            conn = sqlite3.connect('database.db')
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM users')
+            dataset = cursor.fetchall()
+            for data in dataset:
+                if data['username'] == username and data['password'] == password:
+                    conn.close()
+                    self.withdraw()  #closes the previous login page
+                    CTkMessagebox(title="Login successful!",message=f"Welcome {username},you are now logged in!",icon="check",fade_in_duration=1)
+                    #Setup the main application window
+                    setup_main_page(self)
+                
+            conn.close()
+            CTkMessagebox(title="Error",message="Username/password is invalid!",icon="cancel",width=375,height=150)
+                    
             
-            password = password_entry.get()  
-            
-            if username=="admin" and password=="123":
-                print(('Logged in!'))
-                self.withdraw()  #closes the previous login page
-                #Setup the main application window
-                setup_main_page(self)
-            else:
-                if not username:
-                    CTkMessagebox(title="Error",message="Please provide a username",icon="cancel",width=375,height=150)
-                elif not password:
-                    CTkMessagebox(title="Error",message="Please provide a password",icon="cancel",width=375,height=150)
-                else:
-                    CTkMessagebox(title="Error",message="Username/password is invalid!",icon="cancel",width=375,height=150)
-         #Login button
+           
+        #Login button
         login_button = customtkinter.CTkButton(master=frame,text="Login",command=login)
         login_button.pack(pady=12,padx=10)
 
