@@ -1,6 +1,7 @@
 ## IMPORTS ##
 from PIL import Image
 from os import name
+from dataBase import DataBase
 from tkinter import ANCHOR, LEFT
 from typing import  Tuple
 import customtkinter
@@ -132,20 +133,8 @@ class SignUpPage(customtkinter.CTk):
                 if not has_number(password): # Returns message if password doesn't have atleast 1 number
                       return "Password must contain at least 1 digit!"
                 return
-            def does_user_exist(): # Checks if user already exists in database
-                #CHECKS THE DATABASE
-                conn = sqlite3.connect('database.db')
-                conn.row_factory = sqlite3.Row
-                cursor = conn.cursor()
-                cursor.execute('SELECT * FROM users')
-                dataset = cursor.fetchall()
-                for data in dataset:
-                    if data['username'] == user and data['password'] == password:
-                        conn.close()
-                        return True
-                conn.close()
-                return False
-            
+            db_instance = DataBase()
+            does_user_exist = db_instance.does_user_exist(user,password)
             # Message input boxes for errors
             if not is_valid_email(email):
                     CTkMessagebox(title="Error",message="Invalid email, try again!",icon="cancel",width=375,height=150)
@@ -163,7 +152,7 @@ class SignUpPage(customtkinter.CTk):
             if user_msg:
                     CTkMessagebox(title="Error",message=user_msg,icon="cancel",width=375,height=150)
                     return
-            if does_user_exist():
+            if does_user_exist:
                   CTkMessagebox(title="Error",message="Account already exists! Please login",icon="cancel",width=375,height=150)
                   return
             
