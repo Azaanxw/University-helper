@@ -12,10 +12,18 @@ def setup_database():
                     password TEXT NOT NULL
                     )     
                     ''')
-    cursor.execute('INSERT OR IGNORE INTO users (username,email,password) VALUES (?,?,?)', ('admin','admin@test.com','123')) # Creates a defdault login for testing purposes 
+    cursor.execute('INSERT OR IGNORE INTO users (username,email,password) VALUES (?,?,?)', ('admin','admin@test.com','123')) # Creates a default login for testing purposes 
     conn.commit() #Commits the changes 
-    cursor.execute('SELECT * FROM users')
-    data = cursor.fetchall() # Fetches all the data from users table
+    
+     # Creates local_credentials table with specific columns which are username and password (for logging in the next time)
+    cursor.execute(''' 
+                    CREATE TABLE IF NOT EXISTS local_credentials (
+                    username TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL
+                    )     
+                    ''')
+    # cursor.execute('SELECT * FROM users')
+    # data = cursor.fetchall() # Fetches all the data from users table
     # print(data)  # Prints the data on startup
     conn.close()
 if __name__ == "__main__":  # Calls the setup_database function when the script is run as the main program and prevents it from running when it is imported as a module in the main.py script

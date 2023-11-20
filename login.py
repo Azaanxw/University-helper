@@ -33,16 +33,16 @@ class LoginPage(customtkinter.CTk):
 
         def login(): # Function that gets executed every time the "Login" button is pressed
             # gets the string value at the input box
-            username = username_entry.get() 
-            password = password_entry.get() 
-            
-            if username:
-                username_words = username.split() #splits the username string into a list of words depending on if there is a space or not
-                username = "".join(username_words) #joins the words together with no spaces
-            if not username:  #checks if user has inputted anything in the input box
+            self.username = username_entry.get() # gets username value
+            self.password = password_entry.get() # gets password value
+            self.remember_me = checkbox.get() # checks if remember me checkbox is enabled or not (0 or 1)
+            if self.username:
+                username_words = self.username.split() #splits the username string into a list of words depending on if there is a space or not
+                self.username = "".join(username_words) #joins the words together with no spaces
+            if not self.username:  #checks if user has inputted anything in the input box
                 CTkMessagebox(title="Error",message="Please provide a username",icon="cancel",width=375,height=150)
                 return
-            elif not password: #checks if user has inputted anything in the input box
+            elif not self.password: #checks if user has inputted anything in the input box
                 CTkMessagebox(title="Error",message="Please provide a password",icon="cancel",width=375,height=150)
                 return
 
@@ -53,11 +53,18 @@ class LoginPage(customtkinter.CTk):
             cursor.execute('SELECT * FROM users') # grabs all the data from the table 'users'
             dataset = cursor.fetchall() # fetches the results given
             for data in dataset: # loops through all the data
-                if data['username'] == username and data['password'] == password:  # checks if the user,pass already exists in the database 
+                if data['username'] == self.username and data['password'] == self.password:  # checks if the user,pass already exists in the database 
+                    if self.remember_me:
+                        cursor.execute('INSERT OR REPLACE INTO local_credentials (username,password) VALUES (?,?)',(self.username,self.password)) # Adds the current login details to local_credentials table
+                        conn.commit() #Commits the changes
+                    else:
+                        # Deletes the previous local_credential values if remember_me isn't true
+                        cursor.execute('DELETE FROM local_credentials WHERE username = ? AND password = ?', (self.username, self.password))
+                        conn.commit()
                     conn.close() # Closes the connection (saves up on resources)
                     self.withdraw()  #closes the previous login page
 
-                    CTkMessagebox(title="Login successful!",message=f"Welcome {username},you are now logged in!",icon="check",fade_in_duration=1) # Message box if the user successfully logs in with a fade effect
+                    CTkMessagebox(title="Login successful!",message=f"Welcome {self.username},you are now logged in!",icon="check",fade_in_duration=1) # Message box if the user successfully logs in with a fade effect
                     setup_main_page(self) #Setups up the main application window
 
             conn.close() # Closes the connection (saves up on resources)
@@ -98,8 +105,9 @@ class LoginPage(customtkinter.CTk):
              self.signup_page.mainloop()
         def setup_main_page(self): # Makes the login window disappear and puts the main page on the mainloop
              self.withdraw()
+             self.main_page.deiconify()
              self.main_page.mainloop()
-    
+
     #Public login functions to be used by main.py
     def assign_main_page(self,page):
              self.main_page = page # assigns the main page to the object

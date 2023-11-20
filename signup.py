@@ -87,7 +87,9 @@ class SignUpPage(customtkinter.CTk):
             email = email_entry.get()
             password = password_entry.get()
             confirm_password = confirm_password_entry.get()
-
+            if user:
+                user_words = user.split() #splits the username string into a list of words depending on if there is a space or not
+                user = "".join(user_words) #joins the words together with no spaces
             if not user or not email or not password or not confirm_password: # Checks if the string is empty or not
                 CTkMessagebox(title="Error",message="Please fill in everything!",icon="cancel",width=375,height=150)
                 return
@@ -182,6 +184,7 @@ class SignUpPage(customtkinter.CTk):
         #Signup Functions
         def setup_main_page(self):
              self.withdraw()
+             self.main_page.deiconify()
              self.main_page.mainloop()
         
         def on_enter_login_button(event):
