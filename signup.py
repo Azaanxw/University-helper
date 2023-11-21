@@ -14,7 +14,7 @@ icon_path = "Images\\diploma icon.ico"  # Icon path for Signup tab
 def exit_application(): # Exits the signup page w out any errors from callbacks etc
         import sys
         sys.exit(0)
-
+db_instance = DataBase() # creates an instance of the database to interact with it
 #Signup class
 class SignUpPage(customtkinter.CTk): 
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):
@@ -102,18 +102,10 @@ class SignUpPage(customtkinter.CTk):
             def has_uppercase(password): # Checks if at least 1 char has an uppercase
                 return any(char.isupper() for char in password) 
 
-            def valid_user(user): # Checks database to see if user trying to signup already exists
-                #CHECKS THE DATABASE
-                conn = sqlite3.connect('database.db') # connects to the database file and creates one if there isn't one already
-                conn.row_factory = sqlite3.Row # returns rows as special row objects and allows to use dictionary e.g. data[username] instead of data[0]
-                cursor = conn.cursor()  # creates cursor object that interacts with the SQLite database
-                cursor.execute('SELECT * FROM users') # grabs all the data from the table 'users'
-                dataset = cursor.fetchall() # fetches the results given
-                for data in dataset: # loops through all the data
-                    if data['username'] == user: # Checks if any of the usernames already exist
-                        conn.close() # Closes the connection to the database to save on resources
-                        return 'Username already exists! Try a different one.'
-                conn.close() # Closes the connection to the database to save on resources
+            def valid_user(user): # Sees if username meets requirement and if it already exists or not
+                does_username_exist = db_instance.does_user_exist(user=user)
+                if does_username_exist:
+                    return 'Username already exists! Try a different one.'
                 if len(user) < 3: # Checks if the length of the user is less than 3
                      return 'Username is too short!'
                 special_chars = "!@#$%^&*()_+-={}[]|\\:;\"'<>,.?/" 
@@ -133,7 +125,6 @@ class SignUpPage(customtkinter.CTk):
                 if not has_number(password): # Returns message if password doesn't have atleast 1 number
                       return "Password must contain at least 1 digit!"
                 return
-            db_instance = DataBase()
             does_user_exist = db_instance.does_user_exist(user,password)
             # Message input boxes for errors
             if not is_valid_email(email):
@@ -141,28 +132,24 @@ class SignUpPage(customtkinter.CTk):
                     return 
             
             pass_msg= valid_password(password)
-            if pass_msg:
+            if pass_msg: # checks if there's an error message in pass_msg and if there is then it displays it in the message box
                     CTkMessagebox(title="Error",message=pass_msg,icon="cancel",width=375,height=150)
                     return
-            if not password == confirm_password:
+            if not password == confirm_password: # checks to see if the password string is the same as the one entered in confirm_password
                     CTkMessagebox(title="Error",message="Password is not the same as the one entered in confirm password!",icon="cancel",width=375,height=150)
                     return
             
-            user_msg = valid_user(user)
+            user_msg = valid_user(user) #checks to see if the username is valid
             if user_msg:
                     CTkMessagebox(title="Error",message=user_msg,icon="cancel",width=375,height=150)
                     return
-            if does_user_exist:
+            if does_user_exist: # Checks to see if user already exists
                   CTkMessagebox(title="Error",message="Account already exists! Please login",icon="cancel",width=375,height=150)
                   return
             
             else: # Executes if user meets all requirements for creating account
                 print("Passed all checks!")
-                conn = sqlite3.connect('database.db')
-                cursor = conn.cursor()
-                cursor.execute('INSERT OR IGNORE INTO users (username,email,password) VALUES (?,?,?)', (user,email,password)) # Adds the new user,email and pass to the database
-                conn.commit()
-                conn.close()
+                db_instance.add_new_user(user=user,email=email,password=password) # Adds the new data to the dataset
                 CTkMessagebox(title="Account created!",message="Your account has been successfully created! You will now be redirected to main page",icon="check",fade_in_duration=1)
                 setup_main_page(self) # Sets up the main page
                
@@ -175,7 +162,7 @@ class SignUpPage(customtkinter.CTk):
              self.withdraw()
              self.main_page.deiconify()
              self.main_page.mainloop()
-        
+        #Functions for when mouse is hovered over the login button (changes font weight and text color)
         def on_enter_login_button(event):
             back_to_login_button.configure(text_color="#30C30F",font=("Helvetica",15,"bold"))
         
@@ -190,15 +177,15 @@ class SignUpPage(customtkinter.CTk):
         back_to_login_button.bind("<Enter>",on_enter_login_button) 
         back_to_login_button.bind("<Leave>",on_leave_login_button)
     #PUBLIC Signup functions
-    def assign_login_page(self,page):
+    def assign_login_page(self,page): # Assigns the login page 
              self.login_page = page
 
-    def assign_main_page(self,page):
+    def assign_main_page(self,page): # Assigns the main page
              self.main_page = page
 
-    def turn_on(self):
+    def turn_on(self): # Makes the page visible
          self.deiconify()
          self.mainloop()
          
-    def turn_off(self):
+    def turn_off(self):  # Hides the page
          self.withdraw()

@@ -9,7 +9,7 @@ customtkinter.set_appearance_mode("system") # Sets appearance mode based on syst
 customtkinter.set_default_color_theme("green") # Sets color theme to green
 
 icon_path = "Images\\diploma icon.ico" # Icon path for login window 
-
+db_instance = DataBase() # creates an instance of the database to interact with
 # Login class 
 class LoginPage(customtkinter.CTk):
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs): 
@@ -45,33 +45,12 @@ class LoginPage(customtkinter.CTk):
             elif not self.password: #checks if user has inputted anything in the input box
                 CTkMessagebox(title="Error",message="Please provide a password",icon="cancel",width=375,height=150)
                 return
-            
-            db_instance = DataBase()
-            has_correct_login = db_instance.check_database(username=self.username,password=self.password,remember_me_boolean=self.remember_me)
-            if has_correct_login:
+            has_correct_login = db_instance.check_database(username=self.username,password=self.password,remember_me_boolean=self.remember_me) #returns Boolean depending on if the login details are correct
+            if has_correct_login: # Checks to see if the login details are correct and if they are, it redirects the user to the main page
                 CTkMessagebox(title="Login successful!",message=f"Welcome {self.username},you are now logged in!",icon="check",fade_in_duration=1) # Message box if the user successfully logs in with a fade effect
                 setup_main_page(self) #Setups up the main application window
             else:
                 CTkMessagebox(title="Error",message="Username/password is invalid!",icon="cancel",width=375,height=150) # Gives error if login info doesn't exist in database
-            # #CHECKS THE DATABASE
-            # conn = sqlite3.connect('database.db') # connects to the database file and creates one if there isn't one already
-            # conn.row_factory = sqlite3.Row # returns rows as special row objects and allows to use dictionary e.g. data[username] instead of data[0]
-            # cursor = conn.cursor() # creates cursor object that interacts with the SQLite database
-            # cursor.execute('SELECT * FROM users') # grabs all the data from the table 'users'
-            # dataset = cursor.fetchall() # fetches the results given
-            # for data in dataset: # loops through all the data
-            #     if data['username'] == self.username and data['password'] == self.password:  # checks if the user,pass already exists in the database 
-            #         if self.remember_me:
-            #             cursor.execute('INSERT OR REPLACE INTO local_credentials (username,password) VALUES (?,?)',(self.username,self.password)) # Adds the current login details to local_credentials table
-            #             conn.commit() #Commits the changes
-            #         else:
-            #             # Deletes the previous local_credential values if remember_me isn't true
-            #             cursor.execute('DELETE FROM local_credentials WHERE username = ? AND password = ?', (self.username, self.password))
-            #             conn.commit()
-            #         conn.close() # Closes the connection (saves up on resources)
-            #         self.withdraw()  #closes the previous login page
-            # conn.close() # Closes the connection (saves up on resources)
-           
                     
         #Login button
         login_button = customtkinter.CTkButton(master=frame,text="Login",command=login)
