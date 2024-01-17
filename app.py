@@ -1,6 +1,7 @@
 from typing import Optional, Tuple, Union
 import customtkinter
 import sqlite3
+from emailSender import EmailSender
 import time
 from functools import partial
 from CTkMessagebox import CTkMessagebox
@@ -112,6 +113,24 @@ class MainPage(customtkinter.CTk):
 
         # Bind the event to the "Start" button
         pomodoro_container.pack(side=customtkinter.TOP, anchor='ne', pady=10)
+        self.emailPageAlreadyExists = False
+        # Email sender
+        email_container = customtkinter.CTkFrame(self)
+        email_container.pack(side=customtkinter.TOP, pady=30,padx=60, anchor="ne")
+        def setup_email_page():
+            if self.emailPageAlreadyExists:
+                email_page.turn_on()
+            else:
+                email_page = EmailSender(self)
+                email_page.turn_on()
+                self.emailPageAlreadyExists = True
+        
+    
+        email_label = customtkinter.CTkLabel(email_container, text="Email Sender", font=("Nunito", 18, "bold"))
+        email_label.pack(side=customtkinter.TOP, pady=10,padx=20)
+        send_button = customtkinter.CTkButton(email_container, text="Send Email",command=setup_email_page)
+        send_button.pack(pady=10,padx=20)
+
 
     def toggle_timer(self):
         self.current_time = time.time()
@@ -200,8 +219,6 @@ class MainPage(customtkinter.CTk):
 
             # Schedule the update every 1000 milliseconds (1 second)
             self.after(1000, self.update_timer)
-
-
 
 
 
