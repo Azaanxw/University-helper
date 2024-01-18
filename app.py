@@ -5,6 +5,7 @@ from emailSender import EmailSender
 import time
 from functools import partial
 from CTkMessagebox import CTkMessagebox
+from trainNotifier import RailInfoScraperApp
 icon_path = "Images\\diploma icon.ico"    
 from dataBase import DataBase
 db_instance = DataBase() #creates an instance of the database to interact with
@@ -15,7 +16,7 @@ class MainPage(customtkinter.CTk):
         self.title("University Helper")
         self.geometry("920x600")
         self.iconbitmap(default=icon_path)
-        self.resizable(False,False) 
+        self.resizable(True,True) 
         self.current_time = time.time()
         self.last_button_press_time = time.time()
         self.button_press_delay = 0.5
@@ -130,6 +131,14 @@ class MainPage(customtkinter.CTk):
         email_label.pack(side=customtkinter.TOP, pady=10,padx=20)
         send_button = customtkinter.CTkButton(email_container, text="Send Email",command=setup_email_page)
         send_button.pack(pady=10,padx=20)
+    
+    # Train-strike notifier
+        rail_info = RailInfoScraperApp().retrieve_rail_info()
+        # Create a frame for displaying rail information
+        rail_info_frame = customtkinter.CTkScrollableFrame(self, width=300, height=200)
+        rail_info_frame.pack(side=customtkinter.TOP, pady=10,padx=20)
+        self.rail_info_label = customtkinter.CTkLabel(rail_info_frame, text=rail_info, font=("Nunito", 12, "normal"))
+        self.rail_info_label.pack()
 
 
     def toggle_timer(self):
