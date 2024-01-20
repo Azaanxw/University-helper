@@ -16,7 +16,7 @@ class MainPage(customtkinter.CTk):
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):  
         super().__init__(fg_color, **kwargs)
         self.title("University Helper")
-        self.geometry("920x600")
+        self.geometry("920x650")
         self.iconbitmap(default=icon_path)
         self.resizable(True, True)
         self.current_time = time.time()
@@ -160,18 +160,18 @@ class MainPage(customtkinter.CTk):
         self.rail_info_label.pack()
 
         # Deadline Notifier
-        values = ["value 1", "value 2", "value 3", "value 4", "value 5", "value 6"]
-        self.scrollable_checkbox_frame = customtkinter.CTkScrollableFrame(self, label_text="Values")
-        self.scrollable_checkbox_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew")
+        values = ["Walk the dog", "Accept my application","Submit assignment"]
+        self.scrollable_checkbox_frame = customtkinter.CTkScrollableFrame(self, label_text="To-do-list",width=100,height=100)
+        self.scrollable_checkbox_frame.grid(row=2, column=0, columnspan=2, padx=10, pady=(5, 20), sticky="nsew")
 
-        self.checkbox_frame = ToDoList(self.scrollable_checkbox_frame, values=values, app=self)
-        self.checkbox_frame.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        self.checkbox_frame = ToDoList(self.scrollable_checkbox_frame, values=values, app=self,width=100,height=100)
+        self.checkbox_frame.grid(row=0, column=0, padx=10, pady=20, sticky="w")
 
-        self.button = customtkinter.CTkButton(self, text="Add Value", command=self.add_value_callback)
+        self.button = customtkinter.CTkButton(self.scrollable_checkbox_frame, text="Add New Task", command=self.add_value_callback)
         self.button.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 
     def add_value_callback(self):
-        dialog = customtkinter.CTkInputDialog(text="Enter a new value:", title="Add Value")
+        dialog = customtkinter.CTkInputDialog(text="Enter a new task:", title="Add Task")
         new_value = dialog.get_input()
         if new_value:
             self.checkbox_frame.add_value(new_value)

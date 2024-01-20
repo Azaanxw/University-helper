@@ -2,8 +2,10 @@
 import customtkinter
 
 class ToDoList(customtkinter.CTkFrame):
-    def __init__(self, master, values, app):
+    def __init__(self, master, values, app,width,height):
         super().__init__(master)
+        self.width = width
+        self.height = height
         self.values = values
         self.app = app
         self.checkboxes = {}

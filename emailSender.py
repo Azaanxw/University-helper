@@ -35,7 +35,7 @@ class EmailSender(CTk):
         message_label.pack(pady=5)
 
         # Use CTkTextbox for message input
-        self.message_entry = CTkTextbox(message_frame, width=170, height=80)
+        self.message_entry = CTkTextbox(message_frame, width=190, height=80)
         self.message_entry.pack(pady=5)
 
         send_button = CTkButton(self, text="Send", command=self.send_email)
