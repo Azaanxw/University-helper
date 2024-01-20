@@ -119,9 +119,3 @@ class EmailSender(CTk):
     def turn_off(self):
          self.withdraw()
          self.main_page.mainloop()
-
-
-# Example usage
-if __name__ == "__main__":
-    email_page = EmailSender(fg_color="transparent")
-    email_page.turn_on()

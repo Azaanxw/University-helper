@@ -27,6 +27,5 @@ else:
     login_page.turn_on() 
 # TO DO LIST
 # FEATURES TO ADD TO THE MAIN APP
-# Notifier for train strikes - check for location maybe?
 # Deadline notifier ( shows you how many days left till a certain deadline E.g. (exams,holiday,results) - custom
 # Checklist for doing a habit daily e.g. (Study for # number of hours) - custom 

@@ -8,6 +8,7 @@ from CTkMessagebox import CTkMessagebox
 from trainNotifier import RailInfoScraperApp
 icon_path = "Images\\diploma icon.ico"
 from dataBase import DataBase
+from toDoList import ToDoList
 
 db_instance = DataBase()  # creates an instance of the database to interact with
 
@@ -157,6 +158,23 @@ class MainPage(customtkinter.CTk):
             rail_info_frame, text=rail_info, font=("Nunito", 14, "normal")
         )
         self.rail_info_label.pack()
+
+        # Deadline Notifier
+        values = ["value 1", "value 2", "value 3", "value 4", "value 5", "value 6"]
+        self.scrollable_checkbox_frame = customtkinter.CTkScrollableFrame(self, label_text="Values")
+        self.scrollable_checkbox_frame.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew")
+
+        self.checkbox_frame = ToDoList(self.scrollable_checkbox_frame, values=values, app=self)
+        self.checkbox_frame.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
+        self.button = customtkinter.CTkButton(self, text="Add Value", command=self.add_value_callback)
+        self.button.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+
+    def add_value_callback(self):
+        dialog = customtkinter.CTkInputDialog(text="Enter a new value:", title="Add Value")
+        new_value = dialog.get_input()
+        if new_value:
+            self.checkbox_frame.add_value(new_value)
 
     def toggle_timer(self):
         self.current_time = time.time()
