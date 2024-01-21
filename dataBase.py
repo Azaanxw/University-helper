@@ -1,6 +1,7 @@
+# Imports # 
 import sqlite3
 
-class DataBase:
+class DataBase: # Allows users to connect to the database and do certain tasks
     def __init__(self, db_path='database.db'):
         self.db_path = db_path
         self.conn = None
@@ -71,11 +72,13 @@ class DataBase:
                 self.close() # Closes the connection
                 return True
         return False
+    
     def check_if_login_saved(self): # Checks to see if the user previously saved their login for when they pressed "Remember Me" checkbox
         self.connect() # Connects to the database
         self.cursor.execute('SELECT * FROM local_credentials')# grabs all the data from the table 'local_credentials'
         local_cred = self.cursor.fetchone() # fetches the first row in the table 'local_credentials'
         return local_cred # returns True if there is previous saved data and False if there isn't any
+    
     def does_user_exist(self,user,password=None): # Checks if user already exists in database with optional password parameter
             #CHECKS THE DATABASE
             self.connect() # Connects to the database
@@ -91,11 +94,13 @@ class DataBase:
                         return True
             self.close() # Closes the connection
             return False # returns False if username/ username & password doesn't exist in the database
+    
     def add_new_user(self,user,email,password): # Adds the user to the database
         self.connect() # Connects to the database
         self.cursor.execute('INSERT OR IGNORE INTO users (username,email,password) VALUES (?,?,?)', (user,email,password)) # Adds the new user,email and pass to the database
         self.conn.commit() # Commits the changes
         self.close() # Closes the connection
+        
     def delete_saved_login(self): # Deletes the previous local_credential values
         self.connect() # Connects to the database
         self.cursor.execute('DELETE FROM local_credentials') # Deletes the data from the local_credentials table

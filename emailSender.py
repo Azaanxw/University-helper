@@ -1,3 +1,4 @@
+# Imports
 from customtkinter import CTk, CTkLabel, CTkEntry, CTkButton, CTkTextbox
 from CTkMessagebox import CTkMessagebox
 import customtkinter
@@ -15,6 +16,7 @@ class EmailSender(CTk):
         self.resizable(False, False)
         self.main_page = main_page
         self.iconbitmap(icon_path)  # Icon that will be displayed for the email window
+
         # Initialize instance attributes for entry widgets
         self.email_entry = None
         self.app_key_entry = None
@@ -34,14 +36,14 @@ class EmailSender(CTk):
         message_label = CTkLabel(message_frame, text="Message:")
         message_label.pack(pady=5)
 
-        # Use CTkTextbox for message input
+        # Uses CTkTextbox for message input
         self.message_entry = CTkTextbox(message_frame, width=190, height=80)
         self.message_entry.pack(pady=5)
 
         send_button = CTkButton(self, text="Send", command=self.send_email)
         send_button.pack(pady=20)
 
-    def create_entry_frame(self, label_text):
+    def create_entry_frame(self, label_text): # Creates the frame for the inputs to be fit inside 
         entry_frame = customtkinter.CTkFrame(self)
         entry_frame.pack(pady=5)
 
@@ -75,7 +77,7 @@ class EmailSender(CTk):
             CTkMessagebox(title="Error", message="Please fill in all details!", icon="cancel")
             return
 
-        # Email configuration (for Gmail in this example)
+        # Email configuration (for Gmail)
         smtp_server = "smtp.gmail.com"
         smtp_port = 587
         smtp_username = your_email

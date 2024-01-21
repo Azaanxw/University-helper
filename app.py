@@ -1,16 +1,18 @@
-from typing import Optional, Tuple, Union
+# Imports #
+from typing import Tuple
 import customtkinter
-import sqlite3
 from emailSender import EmailSender
 import time
 from functools import partial
 from CTkMessagebox import CTkMessagebox
 from trainNotifier import RailInfoScraperApp
-icon_path = "Images\\diploma icon.ico"
 from dataBase import DataBase
 from toDoList import ToDoList
 import datetime
 from deadlineNotifier import DeadlineNotifier
+
+icon_path = "Images\\diploma icon.ico" # Icon path
+
 db_instance = DataBase()  # creates an instance of the database to interact with
 
 class MainPage(customtkinter.CTk):
@@ -19,7 +21,7 @@ class MainPage(customtkinter.CTk):
         self.title("University Helper")
         self.geometry("920x710")
         self.iconbitmap(default=icon_path)
-        self.resizable(True, True)
+        self.resizable(False, False)
         self.current_time = time.time()
         self.last_button_press_time = time.time()
         self.button_press_delay = 0.5
@@ -43,7 +45,7 @@ class MainPage(customtkinter.CTk):
         self.return_to_login_button.bind("<Enter>", on_enter_return_login_button)
         self.return_to_login_button.bind("<Leave>", on_leave_return_login_button)
 
-        # Features (Pomodoro timer)
+        # Pomodoro timer
         pomodoro_container = customtkinter.CTkFrame(self)
         pomodoro_container.grid(row=0, column=3, pady=10, padx=10, sticky='nswe')
 
@@ -121,6 +123,7 @@ class MainPage(customtkinter.CTk):
 
         self.emailPageAlreadyExists = False
 
+        # Email sender
         email_container = customtkinter.CTkFrame(self)
         email_container.grid(row=0, column=1, pady=30, padx=10, sticky="nsew")
 
@@ -147,6 +150,7 @@ class MainPage(customtkinter.CTk):
         )
         email__info_label.grid(row=2,column=0,padx=10,pady=10)
 
+        # Rail notifier
         rail_info = RailInfoScraperApp().retrieve_rail_info()
 
         rail_info_frame = customtkinter.CTkScrollableFrame(self, width=300, height=200)
@@ -204,13 +208,13 @@ class MainPage(customtkinter.CTk):
 
         self.checkbox_frame_2.add_value(name, date_input)
 
-    def add_value_callback(self):
+    def add_value_callback(self): # Adds the given task to the checkbox frame
         dialog = customtkinter.CTkInputDialog(text="Enter a new task:", title="Add Task")
         new_value = dialog.get_input()
         if new_value:
             self.checkbox_frame.add_value(new_value)
 
-    def toggle_timer(self):
+    def toggle_timer(self): # Allows timer to be enabled or disabled with a delay 
         self.current_time = time.time()
         if self.current_time - self.last_button_press_time >= self.button_press_delay:
             if self.is_running:
@@ -218,7 +222,7 @@ class MainPage(customtkinter.CTk):
             else:
                 self.start_timer()
 
-    def start_timer(self):
+    def start_timer(self): # Starts the timer 
         self.current_time = time.time()
         if self.current_time - self.last_button_press_time >= self.button_press_delay:
             if not self.is_running:
@@ -228,12 +232,12 @@ class MainPage(customtkinter.CTk):
                 self.update_timer()
                 self.start_time = time.time()
 
-    def update_total_hours(self):
+    def update_total_hours(self): # Updates the total time worked on the label
         total_hours, total_minutes = divmod(self.total_seconds_worked // 60, 60)
         time_format = "{:02.0f}h {:02.0f}m".format(total_hours, total_minutes)
         self.total_hours_label.configure(text=f"Total Time Worked: {time_format}")
 
-    def stop_timer(self):
+    def stop_timer(self): # Stops the timer
         self.current_time = time.time()
         if self.current_time - self.last_button_press_time >= self.button_press_delay:
             if self.is_running:
@@ -244,7 +248,7 @@ class MainPage(customtkinter.CTk):
                 self.update_total_hours()
                 self.last_button_press_time = self.current_time
 
-    def reset_timer(self):
+    def reset_timer(self): # Resets the timer back to the given work duration (min)
         self.stop_timer()
         self.initialize_timer()
         self.update_timer()
@@ -253,14 +257,14 @@ class MainPage(customtkinter.CTk):
         self.total_hours_worked = 0
         self.update_total_hours()
 
-    def initialize_timer(self):
+    def initialize_timer(self): # Setups up the timer
         self.work_duration = int(self.work_entry.get()) * 60
         self.seconds_left = self.work_duration
         self.is_break = False
         self.is_running = False
         self.mode_label.configure(text="Work Mode")
 
-    def update_timer(self):
+    def update_timer(self): # Updates the timer and displays the given mins and seconds
         if self.is_running:
             minutes, seconds = divmod(self.seconds_left, 60)
             time_format = "{:02d}:{:02d}".format(minutes, seconds)
@@ -282,17 +286,17 @@ class MainPage(customtkinter.CTk):
 
             self.after(1000, self.update_timer)
 
-    def assign_login_page(self, page):
+    def assign_login_page(self, page): # Assigns the login page
         self.login_page = page
 
-    def turn_off(self):
+    def turn_off(self): # Makes the window disappear
         self.withdraw()
 
-    def turn_on(self):
+    def turn_on(self): # Makes the window reappear
         self.deiconify()
         self.mainloop()
 
-    def back_to_login(self):
+    def back_to_login(self): # Sends user back to login
         db_instance.delete_saved_login()
         self.withdraw()
         self.login_page.deiconify()
