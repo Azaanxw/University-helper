@@ -9,7 +9,8 @@ from trainNotifier import RailInfoScraperApp
 icon_path = "Images\\diploma icon.ico"
 from dataBase import DataBase
 from toDoList import ToDoList
-
+import datetime
+from deadlineNotifier import DeadlineNotifier
 db_instance = DataBase()  # creates an instance of the database to interact with
 
 class MainPage(customtkinter.CTk):
@@ -159,16 +160,50 @@ class MainPage(customtkinter.CTk):
         )
         self.rail_info_label.pack()
 
-        # Deadline Notifier
-        values = ["Walk the dog", "Accept my application","Submit assignment"]
+        # To-Do-List
+        to_do_list_values = ["Walk the dog", "Accept my application","Submit assignment"]
         self.scrollable_checkbox_frame = customtkinter.CTkScrollableFrame(self, label_text="To-do-list",width=100,height=100)
         self.scrollable_checkbox_frame.grid(row=2, column=0, columnspan=2, padx=10, pady=(5, 20), sticky="nsew")
 
-        self.checkbox_frame = ToDoList(self.scrollable_checkbox_frame, values=values, app=self,width=100,height=100)
+        self.checkbox_frame = ToDoList(self.scrollable_checkbox_frame, values=to_do_list_values, app=self,width=100,height=100)
         self.checkbox_frame.grid(row=0, column=0, padx=10, pady=20, sticky="w")
 
         self.button = customtkinter.CTkButton(self.scrollable_checkbox_frame, text="Add New Task", command=self.add_value_callback)
         self.button.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+
+        # Deadline notifier
+        deadline_values =  {"Algorithms exam": {"date": "07/02/2024", "days_remaining": 0},
+                       "Internship deadlines": {"date": "15/02/2024", "days_remaining": 0},
+                       "Java assignment 2": {"date": "17/02/2024", "days_remaining": 0},}
+        self.scrollable_checkbox_frame_2 = customtkinter.CTkScrollableFrame(self, label_text="Deadlines")
+        self.scrollable_checkbox_frame_2.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew")
+
+        self.checkbox_frame_2 = DeadlineNotifier(self.scrollable_checkbox_frame_2, values=deadline_values, app=self)
+        self.checkbox_frame_2.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
+        self.button_2 = customtkinter.CTkButton(self, text="Add Deadline", command=self.add_value_callback_2)
+        self.button_2.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+
+    def add_value_callback_2(self):
+        name_dialog = customtkinter.CTkInputDialog(text="Enter a new deadline:", title="Add a Deadline")
+        name = name_dialog.get_input()
+
+        if not name:
+            return
+
+        date_dialog = customtkinter.CTkInputDialog(text="Enter the date (DD/MM/YYYY):", title="Add Date")
+        date_input = date_dialog.get_input()
+
+        if not date_input:
+            return
+
+        try:
+            datetime.datetime.strptime(date_input, "%d/%m/%Y")
+        except:
+            CTkMessagebox(title="Invalid Date", message="Please enter a valid date (DD/MM/YYYY)", icon="warning")
+            return
+
+        self.checkbox_frame_2.add_value(name, date_input)
 
     def add_value_callback(self):
         dialog = customtkinter.CTkInputDialog(text="Enter a new task:", title="Add Task")
