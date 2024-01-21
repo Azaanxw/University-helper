@@ -14,9 +14,8 @@ class DeadlineNotifier(customtkinter.CTkFrame):
         for i, (value, data) in enumerate(self.values.items()):
             checkbox_text = f"{value} - {data['date']} (Days remaining: {data['days_remaining']})"
             checkbox = customtkinter.CTkCheckBox(self, text=checkbox_text, command=lambda v=value: self.checkbox_callback(v))
-            checkbox.grid(row=i, column=0, padx=10, pady=(10, 0), sticky="w")
+            checkbox.grid(row=i, column=0, padx=80, pady=(20, 0), sticky="nsew",columnspan=3)  # Center content
             self.checkboxes[value] = checkbox
-
     def update_dates(self):
         today = datetime.now().date()
 
@@ -66,5 +65,5 @@ class DeadlineNotifier(customtkinter.CTkFrame):
             for i, (value, data) in enumerate(self.values.items()):
                 checkbox_text = f"{value} - {data['date']} (Days remaining: {data['days_remaining']})"
                 checkbox = customtkinter.CTkCheckBox(self, text=checkbox_text, command=lambda v=value: self.checkbox_callback(v))
-                checkbox.grid(row=i, column=0, padx=10, pady=(10, 0), sticky="w")
+                checkbox.grid(row=i, column=0, padx=10, pady=(10, 0), sticky="nsew")  # Center content
                 self.checkboxes[value] = checkbox

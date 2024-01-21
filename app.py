@@ -17,7 +17,7 @@ class MainPage(customtkinter.CTk):
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):  
         super().__init__(fg_color, **kwargs)
         self.title("University Helper")
-        self.geometry("920x650")
+        self.geometry("920x710")
         self.iconbitmap(default=icon_path)
         self.resizable(True, True)
         self.current_time = time.time()
@@ -32,7 +32,7 @@ class MainPage(customtkinter.CTk):
             font=("Nunito", 16, "normal"), text_color="#F9F6EE", hover=False,
             corner_radius=5, command=partial(self.back_to_login)
         )
-        self.return_to_login_button.grid(row=2, column=2, pady=10)
+        self.return_to_login_button.grid(row=3, column=2, pady=(30,10),padx=10,sticky="s")
 
         def on_enter_return_login_button(event):
             self.return_to_login_button.configure(text_color="#EDEADE", font=("Nunito", 16, "bold"))
@@ -166,7 +166,7 @@ class MainPage(customtkinter.CTk):
         self.scrollable_checkbox_frame.grid(row=2, column=0, columnspan=2, padx=10, pady=(5, 20), sticky="nsew")
 
         self.checkbox_frame = ToDoList(self.scrollable_checkbox_frame, values=to_do_list_values, app=self,width=100,height=100)
-        self.checkbox_frame.grid(row=0, column=0, padx=10, pady=20, sticky="w")
+        self.checkbox_frame.grid(row=0, column=0, padx=10, pady=(10,0), sticky="nsew")
 
         self.button = customtkinter.CTkButton(self.scrollable_checkbox_frame, text="Add New Task", command=self.add_value_callback)
         self.button.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
@@ -176,14 +176,13 @@ class MainPage(customtkinter.CTk):
                        "Internship deadlines": {"date": "15/02/2024", "days_remaining": 0},
                        "Java assignment 2": {"date": "17/02/2024", "days_remaining": 0},}
         self.scrollable_checkbox_frame_2 = customtkinter.CTkScrollableFrame(self, label_text="Deadlines")
-        self.scrollable_checkbox_frame_2.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nsew")
+        self.scrollable_checkbox_frame_2.grid(row=2, column=2, padx=10, pady=(10, 0), sticky="nsew",columnspan=2)
 
         self.checkbox_frame_2 = DeadlineNotifier(self.scrollable_checkbox_frame_2, values=deadline_values, app=self)
         self.checkbox_frame_2.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
-        self.button_2 = customtkinter.CTkButton(self, text="Add Deadline", command=self.add_value_callback_2)
-        self.button_2.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
-
+        self.button_2 = customtkinter.CTkButton(self.scrollable_checkbox_frame_2, text="Add Deadline", command=self.add_value_callback_2)
+        self.button_2.grid(row=1, column=0, padx=90, pady=15, sticky="ew")
     def add_value_callback_2(self):
         name_dialog = customtkinter.CTkInputDialog(text="Enter a new deadline:", title="Add a Deadline")
         name = name_dialog.get_input()
